@@ -53,9 +53,9 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground scroll-smooth">
+    <div className="min-h-screen bg-background text-foreground scroll-smooth p-3">
       <header className="border-b border-border sticky top-0 z-10 bg-background/90 backdrop-blur-sm">
-        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex justify-between items-center mobile-stack">
+        <div className="container mx-auto py-3 sm:py-4 flex justify-between items-center mobile-stack">
           <div>
             <h1 className="responsive-text-xl sm:responsive-text-2xl font-bold">{siteName}</h1>
           </div>
@@ -76,7 +76,7 @@ function App() {
         </div>
       </header>
 
-      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
+      <main className="container mx-auto py-4 sm:py-6 md:py-8">
         {selectedNode ? (
           /* 节点图表视图 */
           <div>
