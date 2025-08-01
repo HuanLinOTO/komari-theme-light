@@ -42,7 +42,7 @@ npm run build
 zip -r komari-theme-light.zip komari-theme.json dist/ preview.png
 ```
 
-将 `komari-tailwind-theme.zip` 上传至 Komari 后台即可。
+将 `komari-theme-light.zip` 上传至 Komari 后台即可。
 
 ## 浏览器支持
 

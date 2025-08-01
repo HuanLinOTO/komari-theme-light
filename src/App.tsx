@@ -85,7 +85,6 @@ function App() {
                 <ArrowLeft className="h-4 w-4 mr-1 sm:mr-2" />
                 返回节点列表
               </Button>
-              <h2 className="responsive-text-lg sm:responsive-text-xl font-bold">{selectedNode.name} - 历史数据</h2>
             </div>
             <NodeCharts
               nodeUuid={selectedNode.uuid}
