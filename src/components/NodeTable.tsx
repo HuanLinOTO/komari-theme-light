@@ -67,6 +67,14 @@ export function NodeTable({ nodes, onViewCharts }: NodeTableProps) {
     return `${days}d ${hours}h ${minutes}m`;
   };
 
+  const formatRegion = (region: string): string => {
+    // 处理台湾地区 emoji 显示问题，在中国大陆显示为联合国旗帜
+    if (region.includes('🇹🇼') || region.toLowerCase().includes('taiwan') || region.includes('台湾')) {
+      return region.replace(/🇹🇼/g, '🇺🇳').replace(/taiwan/gi, 'Taiwan').replace(/台湾/g, 'Taiwan');
+    }
+    return region;
+  };
+
   return (
     <div className="overflow-x-auto">
       <Table>
@@ -101,7 +109,7 @@ export function NodeTable({ nodes, onViewCharts }: NodeTableProps) {
                   </div>
                 </TableCell>
                 <TableCell className="p-2 sm:p-4 font-medium">{node.name}</TableCell>
-                <TableCell className="p-2 sm:p-4 text-muted-foreground hidden sm:table-cell">{node.region}</TableCell>
+                <TableCell className="p-2 sm:p-4 text-muted-foreground hidden sm:table-cell">{formatRegion(node.region)}</TableCell>
                 <TableCell className="p-2 sm:p-4 text-muted-foreground hidden md:table-cell">{node.group}</TableCell>
                 <TableCell className="p-2 sm:p-4">
                   {stats ? (

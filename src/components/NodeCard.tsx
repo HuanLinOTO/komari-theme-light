@@ -65,6 +65,14 @@ export function NodeCard({ node, onViewCharts }: NodeCardProps) {
     return `${days}天`;
   };
 
+  const formatRegion = (region: string): string => {
+    // 处理台湾地区 emoji 显示问题，在中国大陆显示为联合国旗帜
+    if (region.includes('🇹🇼') || region.toLowerCase().includes('taiwan') || region.includes('台湾')) {
+      return region.replace(/🇹🇼/g, '🇺🇳').replace(/taiwan/gi, 'Taiwan').replace(/台湾/g, 'Taiwan');
+    }
+    return region;
+  };
+
   const isOnline = node.status === 'online';
   const stats = node.stats;
 
@@ -82,7 +90,7 @@ export function NodeCard({ node, onViewCharts }: NodeCardProps) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Activity className={`h-5 w-5 ${isOnline ? 'text-green-500' : 'text-red-500'}`} />
-            <CardTitle className="text-lg sm:text-base">{node.name}</CardTitle>
+            <CardTitle className="text-lg sm:text-base">{node.name} {formatRegion(node.region)}</CardTitle>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant={isOnline ? 'default' : 'secondary'} className="text-xs">

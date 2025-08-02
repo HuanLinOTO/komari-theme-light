@@ -13,7 +13,7 @@ import './App.css'
 function App() {
   const [selectedNode, setSelectedNode] = useState<{ uuid: string; name: string } | null>(null);
   const [siteName, setSiteName] = useState<string>('Komari Monitor');
-  
+
   const {
     nodes,
     loading,
@@ -53,7 +53,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground scroll-smooth p-3">
+    <div className="min-h-screen bg-background text-foreground scroll-smooth px-3">
       <header className="border-b border-border sticky top-0 z-10 bg-background/90 backdrop-blur-sm">
         <div className="container mx-auto py-3 sm:py-4 flex justify-between items-center mobile-stack">
           <div>
@@ -161,7 +161,25 @@ function App() {
 
       <footer className="border-t border-border mt-8 sm:mt-12">
         <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 text-center text-muted-foreground responsive-text-xs">
-          Powered by Komari Monitor.
+          Powered by{' '}
+          <a
+            href="https://github.com/komari-monitor/komari"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            Komari Monitor
+          </a>
+          {' '}with{' '}
+          <a
+            href="https://github.com/uvexz/komari-theme-light"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            Theme Light
+          </a>
+          .
         </div>
       </footer>
     </div>
