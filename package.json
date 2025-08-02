@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "package": "npm run build && zip -r komari-theme-light.zip dist/ komari-theme.json preview.png"
   },
   "dependencies": {
     "@radix-ui/react-progress": "^1.1.7",

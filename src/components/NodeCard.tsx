@@ -8,7 +8,7 @@ import {
   TableCell,
   TableRow,
 } from './ui/table';
-import { Activity, Cpu, HardDrive, MemoryStick, Network, BarChart3, Tag, Timer } from 'lucide-react';
+import { Activity, Cpu, HardDrive, MemoryStick, Network, BarChart3, Tag, Timer, BadgeDollarSign } from 'lucide-react';
 
 interface NodeData {
   uuid: string;
@@ -67,7 +67,7 @@ export function NodeCard({ node, onViewCharts }: NodeCardProps) {
 
   const isOnline = node.status === 'online';
   const stats = node.stats;
-  
+
   // 解析标签，支持逗号和分号分隔
   const tagList = node.tags ?
     node.tags
@@ -101,12 +101,12 @@ export function NodeCard({ node, onViewCharts }: NodeCardProps) {
             )}
           </div>
         </div>
-        
+
         <div className="flex flex-wrap items-center gap-1 sm:gap-2 text-sm text-muted-foreground">
           <Badge variant="outline" className="text-xs">
             {node.group}
           </Badge>
-          
+
           {tagList.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {tagList.map((tag, index) => (
@@ -119,7 +119,7 @@ export function NodeCard({ node, onViewCharts }: NodeCardProps) {
           )}
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-4 sm:space-y-5">
         {stats && (
           <>
@@ -134,7 +134,7 @@ export function NodeCard({ node, onViewCharts }: NodeCardProps) {
               </div>
               <Progress value={stats.cpu.usage} className="h-2" />
             </div>
-            
+
             {/* 内存使用率 */}
             <div className="space-y-1.5 sm:space-y-2">
               <div className="flex items-center justify-between">
@@ -148,7 +148,7 @@ export function NodeCard({ node, onViewCharts }: NodeCardProps) {
               </div>
               <Progress value={(stats.ram.used / stats.ram.total) * 100} className="h-2" />
             </div>
-            
+
             {/* 磁盘使用率 */}
             <div className="space-y-1.5 sm:space-y-2">
               <div className="flex items-center justify-between">
@@ -164,7 +164,7 @@ export function NodeCard({ node, onViewCharts }: NodeCardProps) {
             </div>
           </>
         )}
-        
+
         {/* 网络总流量和运行时间表格 */}
         <Table>
           <TableBody>
@@ -197,10 +197,15 @@ export function NodeCard({ node, onViewCharts }: NodeCardProps) {
                 </TableRow>
               </>
             )}
-            {node.price > 0 && (
+            {(node.price > 0 || node.price === -1) && (
               <TableRow>
-                <TableCell className="text-muted-foreground  flex items-center gap-2">价格</TableCell>
-                <TableCell className="text-right">{node.currency}{node.price}/{node.billing_cycle}天</TableCell>
+                <TableCell className="text-muted-foreground  flex items-center gap-2">
+                  <BadgeDollarSign className="h-4 w-4" />
+                  价格
+                </TableCell>
+                <TableCell className="text-right">
+                  {node.price === -1 ? '免费' : `${node.currency}${node.price}/${node.billing_cycle}天`}
+                </TableCell>
               </TableRow>
             )}
           </TableBody>
