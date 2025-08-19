@@ -363,6 +363,33 @@
 
 /* 组件特定样式 */
 @layer components {
+  /* 图表容器移动端优化 */
+  .chart-mobile-optimized {
+    overflow: hidden;
+  }
+  
+  .chart-mobile-optimized .recharts-wrapper {
+    overflow: visible !important;
+  }
+  
+  .chart-mobile-optimized .recharts-cartesian-axis-tick-value {
+    font-size: 11px !important;
+  }
+  
+  @media (max-width: 640px) {
+    .chart-mobile-optimized .recharts-cartesian-axis-tick-value {
+      font-size: 10px !important;
+    }
+    
+    .chart-mobile-optimized .recharts-legend-wrapper {
+      font-size: 12px !important;
+    }
+    
+    .chart-mobile-optimized .recharts-tooltip-wrapper {
+      font-size: 12px !important;
+    }
+  }
+  
   /* 卡片悬停效果 */
   .card-hover {
     transition: all 0.2s ease-in-out;
@@ -504,6 +531,26 @@
     
     .mobile-hide {
       display: none;
+    }
+    
+    /* 图表容器移动端特殊处理 */
+    .chart-mobile-optimized {
+      min-height: 200px;
+      max-width: 100vw;
+    }
+    
+    .chart-mobile-optimized .recharts-surface {
+      overflow: visible;
+    }
+    
+    /* 确保图表不会超出容器边界 */
+    .chart-mobile-optimized .recharts-cartesian-grid line {
+      stroke-width: 0.5;
+    }
+    
+    /* 优化图例在移动端的显示 */
+    .chart-mobile-optimized .recharts-legend-item {
+      margin-right: 8px !important;
     }
   }
 }

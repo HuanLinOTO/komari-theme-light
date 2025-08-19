@@ -69,6 +69,23 @@ const colors = [
   "#6366F1", // 靛蓝色 - SWAP
 ];
 
+// 自定义 hook 检测屏幕尺寸
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
+  return isMobile;
+};
+
 export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
   const [loadData, setLoadData] = useState<LoadRecord[] | null>(null);
   const [pingData, setPingData] = useState<PingRecord[] | null>(null);
@@ -77,6 +94,26 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
   const [error, setError] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState(24); // 默认24小时
   const [hiddenLines, setHiddenLines] = useState<Record<string, boolean>>({});
+  const isMobile = useIsMobile();
+
+  // 图表边距和尺寸配置
+  const chartMargin = useMemo(() => ({
+    top: 10,
+    right: isMobile ? 4 : 16,
+    bottom: isMobile ? 20 : 10,
+    left: isMobile ? 4 : 16
+  }), [isMobile]);
+
+  const yAxisConfig = useMemo(() => ({
+    tick: { fontSize: isMobile ? 10 : 12, dx: -5 },
+    width: isMobile ? 35 : 40
+  }), [isMobile]);
+
+  const xAxisConfig = useMemo(() => ({
+    tick: { fontSize: isMobile ? 10 : 11 },
+    height: isMobile ? 30 : 40,
+    minTickGap: isMobile ? 50 : 30
+  }), [isMobile]);
 
   useEffect(() => {
     if (!nodeUuid) return;
@@ -164,16 +201,29 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
     );
   }, [pingData]);
 
-  const timeFormatter = (value: any, index: number) => {
+  const timeFormatter = useCallback((value: any, index: number) => {
     if (!chartData.length) return "";
-    if (index === 0 || index === chartData.length - 1) {
-      return new Date(value).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+    const totalTicks = chartData.length;
+
+    if (isMobile) {
+      // 移动端只显示首尾标签
+      if (index === 0 || index === totalTicks - 1) {
+        return new Date(value).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+    } else {
+      // 桌面端显示首尾和中间标签
+      if (index === 0 || index === totalTicks - 1 || index === Math.floor(totalTicks / 2)) {
+        return new Date(value).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
     }
     return "";
-  };
+  }, [chartData.length, isMobile]);
 
   const labelFormatter = (value: any) => {
     const date = new Date(value);
@@ -329,7 +379,7 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 w-full overflow-hidden">
       {/* 时间范围选择器 */}
       <Card>
         <CardHeader>
@@ -376,7 +426,7 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
         </CardHeader>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
 
         {/* CPU使用率 */}
         <Card>
@@ -387,12 +437,12 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={cpuChartConfig} className="h-[250px] sm:h-[300px]">
+            <ChartContainer config={cpuChartConfig} className="h-[200px] sm:h-[250px] md:h-[300px] overflow-hidden chart-mobile-optimized">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={chartData}
                   accessibilityLayer
-                  margin={{ top: 10, right: 16, bottom: 10, left: 16 }}
+                  margin={chartMargin}
                 >
                   <CartesianGrid vertical={false} />
                   <XAxis
@@ -401,7 +451,9 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
                     axisLine={false}
                     tickFormatter={timeFormatter}
                     interval="preserveStartEnd"
-                    minTickGap={30}
+                    minTickGap={xAxisConfig.minTickGap}
+                    tick={xAxisConfig.tick}
+                    height={xAxisConfig.height}
                   />
                   <YAxis
                     domain={[0, 100]}
@@ -411,8 +463,8 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
                     allowDecimals={false}
                     orientation="left"
                     type="number"
-                    tick={{ dx: -10 }}
-                    mirror={true}
+                    tick={yAxisConfig.tick}
+                    width={yAxisConfig.width}
                   />
                   <ChartTooltip
                     cursor={false}
@@ -451,12 +503,12 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={loadChartConfig} className="h-[250px] sm:h-[300px]">
+            <ChartContainer config={loadChartConfig} className="h-[200px] sm:h-[250px] md:h-[300px] overflow-hidden chart-mobile-optimized">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={chartData}
                   accessibilityLayer
-                  margin={{ top: 10, right: 16, bottom: 10, left: 16 }}
+                  margin={chartMargin}
                 >
                   <CartesianGrid vertical={false} />
                   <XAxis
@@ -465,15 +517,17 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
                     axisLine={false}
                     tickFormatter={timeFormatter}
                     interval="preserveStartEnd"
-                    minTickGap={30}
+                    minTickGap={xAxisConfig.minTickGap}
+                    tick={xAxisConfig.tick}
+                    height={xAxisConfig.height}
                   />
                   <YAxis
                     tickLine={false}
                     axisLine={false}
                     orientation="left"
                     type="number"
-                    tick={{ dx: -10 }}
-                    mirror={true}
+                    tick={yAxisConfig.tick}
+                    width={yAxisConfig.width}
                   />
                   <ChartTooltip
                     cursor={false}
@@ -511,12 +565,12 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={ramChartConfig} className="h-[250px] sm:h-[300px]">
+            <ChartContainer config={ramChartConfig} className="h-[200px] sm:h-[250px] md:h-[300px] overflow-hidden chart-mobile-optimized">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={chartData}
                   accessibilityLayer
-                  margin={{ top: 10, right: 16, bottom: 10, left: 16 }}
+                  margin={chartMargin}
                 >
                   <CartesianGrid vertical={false} />
                   <XAxis
@@ -525,7 +579,9 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
                     axisLine={false}
                     tickFormatter={timeFormatter}
                     interval="preserveStartEnd"
-                    minTickGap={30}
+                    minTickGap={xAxisConfig.minTickGap}
+                    tick={xAxisConfig.tick}
+                    height={xAxisConfig.height}
                   />
                   <YAxis
                     domain={[0, 100]}
@@ -535,8 +591,8 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
                     allowDecimals={false}
                     orientation="left"
                     type="number"
-                    tick={{ dx: -10 }}
-                    mirror={true}
+                    tick={yAxisConfig.tick}
+                    width={yAxisConfig.width}
                   />
                   <ChartTooltip
                     cursor={false}
@@ -585,12 +641,12 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={diskChartConfig} className="h-[250px] sm:h-[300px]">
+            <ChartContainer config={diskChartConfig} className="h-[200px] sm:h-[250px] md:h-[300px] overflow-hidden chart-mobile-optimized">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={chartData}
                   accessibilityLayer
-                  margin={{ top: 10, right: 16, bottom: 10, left: 16 }}
+                  margin={chartMargin}
                 >
                   <CartesianGrid vertical={false} />
                   <XAxis
@@ -599,7 +655,9 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
                     axisLine={false}
                     tickFormatter={timeFormatter}
                     interval="preserveStartEnd"
-                    minTickGap={30}
+                    minTickGap={xAxisConfig.minTickGap}
+                    tick={xAxisConfig.tick}
+                    height={xAxisConfig.height}
                   />
                   <YAxis
                     domain={[0, 100]}
@@ -609,8 +667,8 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
                     allowDecimals={false}
                     orientation="left"
                     type="number"
-                    tick={{ dx: -10 }}
-                    mirror={true}
+                    tick={yAxisConfig.tick}
+                    width={yAxisConfig.width}
                   />
                   <ChartTooltip
                     cursor={false}
@@ -649,12 +707,12 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={connectionsChartConfig} className="h-[250px] sm:h-[300px]">
+            <ChartContainer config={connectionsChartConfig} className="h-[200px] sm:h-[250px] md:h-[300px] overflow-hidden chart-mobile-optimized">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={chartData}
                   accessibilityLayer
-                  margin={{ top: 10, right: 16, bottom: 10, left: 16 }}
+                  margin={chartMargin}
                 >
                   <CartesianGrid vertical={false} />
                   <XAxis
@@ -663,15 +721,17 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
                     axisLine={false}
                     tickFormatter={timeFormatter}
                     interval="preserveStartEnd"
-                    minTickGap={30}
+                    minTickGap={xAxisConfig.minTickGap}
+                    tick={xAxisConfig.tick}
+                    height={xAxisConfig.height}
                   />
                   <YAxis
                     tickLine={false}
                     axisLine={false}
                     orientation="left"
                     type="number"
-                    tick={{ dx: -10 }}
-                    mirror={true}
+                    tick={yAxisConfig.tick}
+                    width={yAxisConfig.width}
                   />
                   <ChartTooltip
                     cursor={false}
@@ -718,12 +778,12 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={networkChartConfig} className="h-[250px] sm:h-[300px]">
+            <ChartContainer config={networkChartConfig} className="h-[200px] sm:h-[250px] md:h-[300px] overflow-hidden chart-mobile-optimized">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
                   data={chartData}
                   accessibilityLayer
-                  margin={{ top: 10, right: 16, bottom: 10, left: 16 }}
+                  margin={chartMargin}
                 >
                   <CartesianGrid vertical={false} />
                   <XAxis
@@ -732,7 +792,9 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
                     axisLine={false}
                     tickFormatter={timeFormatter}
                     interval="preserveStartEnd"
-                    minTickGap={30}
+                    minTickGap={xAxisConfig.minTickGap}
+                    tick={xAxisConfig.tick}
+                    height={xAxisConfig.height}
                   />
                   <YAxis
                     tickLine={false}
@@ -740,8 +802,8 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
                     unit="KB/s"
                     orientation="left"
                     type="number"
-                    tick={{ dx: -10 }}
-                    mirror={true}
+                    tick={{ ...yAxisConfig.tick, dx: -5 }}
+                    width={isMobile ? 50 : 60}
                   />
                   <ChartTooltip
                     cursor={false}
@@ -786,12 +848,12 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ChartContainer config={pingChartConfig} className="h-[250px] sm:h-[300px]">
+              <ChartContainer config={pingChartConfig} className="h-[200px] sm:h-[250px] md:h-[300px] overflow-hidden chart-mobile-optimized">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
                     data={pingChartData}
                     accessibilityLayer
-                    margin={{ top: 10, right: 16, bottom: 10, left: 16 }}
+                    margin={chartMargin}
                   >
                     <CartesianGrid vertical={false} />
                     <XAxis
@@ -800,7 +862,9 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
                       axisLine={false}
                       tickFormatter={timeFormatter}
                       interval="preserveStartEnd"
-                      minTickGap={30}
+                      minTickGap={xAxisConfig.minTickGap}
+                      tick={xAxisConfig.tick}
+                      height={xAxisConfig.height}
                     />
                     <YAxis
                       tickLine={false}
@@ -809,8 +873,8 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
                       allowDecimals={false}
                       orientation="left"
                       type="number"
-                      tick={{ dx: -10 }}
-                      mirror={true}
+                      tick={yAxisConfig.tick}
+                      width={isMobile ? 45 : 50}
                     />
                     <ChartTooltip
                       cursor={false}
