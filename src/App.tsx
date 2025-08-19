@@ -96,53 +96,88 @@ function App() {
           <>
             {/* 统计概览 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-              <Card className="data-card card-hover">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="responsive-text-sm font-medium">服务器总数</CardTitle>
-                  <Server className="h-4 w-4 text-muted-foreground" />
+              <Card className="border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                    服务器总数
+                  </CardTitle>
+                  <Server className="h-5 w-5 text-blue-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="responsive-text-2xl font-bold">{nodes.length}</div>
-                  <p className="responsive-text-xs text-muted-foreground">
-                    {groups.length} 个分组
-                  </p>
+                  <div className="text-3xl font-bold mb-5">{nodes.length}</div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="text-sm text-muted-foreground">
+                      {groups.length} 个分组
+                    </p>
+                    {nodes.length > 0 && (
+                      <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800 font-medium">
+                        正常
+                      </span>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card className="data-card data-card-success card-hover">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="responsive-text-sm font-medium">在线服务器</CardTitle>
-                  <Activity className="h-4 w-4 text-green-500" />
+              <Card className="border-l-4 border-l-green-500 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    在线服务器
+                  </CardTitle>
+                  <Activity className="h-5 w-5 text-green-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="responsive-text-2xl font-bold text-green-600">{onlineCount}</div>
-                  <p className="responsive-text-xs text-muted-foreground">
-                    {nodes.length > 0 ? ((onlineCount / nodes.length) * 100).toFixed(1) : 0}% 可用率
-                  </p>
+                  <div className="text-3xl font-bold text-green-600 mb-5">{onlineCount}</div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="text-sm text-muted-foreground">
+                      {nodes.length > 0 ? ((onlineCount / nodes.length) * 100).toFixed(1) : 0}% 可用率
+                    </p>
+                    {onlineCount === nodes.length && nodes.length > 0 && (
+                      <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 font-medium">
+                        全部在线
+                      </span>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card className="data-card data-card-danger card-hover">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="responsive-text-sm font-medium">离线服务器</CardTitle>
-                  <AlertCircle className="h-4 w-4 text-red-500" />
+              <Card className="border-l-4 border-l-red-500 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    离线服务器
+                  </CardTitle>
+                  <AlertCircle className="h-5 w-5 text-red-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="responsive-text-2xl font-bold text-red-600">{offlineCount}</div>
-                  <p className="responsive-text-xs text-muted-foreground">
-                    需要关注
-                  </p>
+                  <div className="text-3xl font-bold text-red-600 mb-5">{offlineCount}</div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="text-sm text-muted-foreground">
+                      需要关注
+                    </p>
+                    {offlineCount > 0 && (
+                      <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-800 font-medium animate-pulse">
+                        需要检查
+                      </span>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             </div>
 
             {/* 错误提示 */}
             {error && (
-              <Card className="mb-4 sm:mb-6 border-red-200 bg-red-50">
+              <Card className="mb-4 sm:mb-6 border-l-4 border-l-red-500 bg-red-50 shadow-sm">
                 <CardContent className="pt-4 sm:pt-6">
-                  <div className="flex items-center space-x-2 text-red-800">
-                    <AlertCircle className="h-4 w-4" />
-                    <p className="responsive-text-xs sm:responsive-text-sm">{error}</p>
+                  <div className="flex items-center space-x-3 text-red-800">
+                    <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                      <AlertCircle className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="font-medium">连接错误</p>
+                      <p className="text-sm opacity-90">{error}</p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

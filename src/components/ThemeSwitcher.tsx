@@ -1,4 +1,11 @@
 import { useTheme } from '../hooks/useTheme';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select';
 
 export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
@@ -12,18 +19,17 @@ export function ThemeSwitcher() {
   ];
 
   return (
-    <div className="flex items-center gap-2">
-      <select
-        value={theme}
-        onChange={(e) => setTheme(e.target.value as any)}
-        className="px-3 py-1 text-sm border border-border rounded-md bg-background"
-      >
+    <Select value={theme} onValueChange={(value) => setTheme(value as any)}>
+      <SelectTrigger className="w-[120px]">
+        <SelectValue placeholder="选择主题" />
+      </SelectTrigger>
+      <SelectContent>
         {themes.map(({ id, name }) => (
-          <option key={id} value={id}>
+          <SelectItem key={id} value={id}>
             {name}
-          </option>
+          </SelectItem>
         ))}
-      </select>
-    </div>
+      </SelectContent>
+    </Select>
   );
 }

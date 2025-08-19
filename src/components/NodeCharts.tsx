@@ -56,15 +56,17 @@ interface TaskInfo {
 }
 
 
+// 优化后的颜色方案，使用更现代、更协调的配色
 const colors = [
-  "#F38181",
-  "#347433",
-  "#898AC4",
-  "#03A6A1",
-  "#7AD6F0",
-  "#B388FF",
-  "#FF8A65",
-  "#FFD600",
+  "#3B82F6", // 蓝色 - CPU
+  "#10B981", // 绿色 - 系统负载
+  "#8B5CF6", // 紫色 - 内存
+  "#F59E0B", // 橙色 - 磁盘
+  "#EF4444", // 红色 - TCP连接
+  "#06B6D4", // 青色 - UDP连接
+  "#EC4899", // 粉色 - 入站流量
+  "#84CC16", // 黄绿色 - 出站流量
+  "#6366F1", // 靛蓝色 - SWAP
 ];
 
 export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
@@ -208,7 +210,7 @@ export function NodeCharts({ nodeUuid, nodeName }: NodeChartsProps) {
     },
     swap: {
       label: "SWAP使用率",
-      color: colors[8] || "#4CAF50", // 使用新颜色或备用颜色
+      color: colors[8],
     },
   } as const;
 
