@@ -196,10 +196,10 @@ function App() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl font-bold text-purple-600 mb-1">
-                    ↑ {(networkStats.totalUp / 1024).toFixed(1)} MB/s
+                    ↑ {(networkStats.totalUp / 1024).toFixed(1)} KB/s
                   </div>
                   <div className="text-xl font-bold text-purple-600 mb-5">
-                    ↓ {(networkStats.totalDown / 1024).toFixed(1)} MB/s
+                    ↓ {(networkStats.totalDown / 1024).toFixed(1)} KB/s
                   </div>
                   <div className="flex items-center gap-2 mt-1">
                     <p className="text-xs text-muted-foreground">
