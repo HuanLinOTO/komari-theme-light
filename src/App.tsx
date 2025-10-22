@@ -65,6 +65,24 @@ function App() {
 
   const networkStats = getTotalNetworkStats();
 
+  // 格式化网络速度，自动选择合适的单位
+  const formatSpeed = (bytesPerSecond: number): string => {
+    if (bytesPerSecond === 0) return '0 B/s';
+    const k = 1024;
+    const sizes = ['B/s', 'KB/s', 'MB/s', 'GB/s'];
+    const i = Math.floor(Math.log(bytesPerSecond) / Math.log(k));
+    return parseFloat((bytesPerSecond / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  };
+
+  // 格式化流量，自动选择合适的单位
+  const formatBytes = (bytes: number): string => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
   const handleViewCharts = (nodeUuid: string, nodeName: string) => {
     setSelectedNode({ uuid: nodeUuid, name: nodeName });
   };
@@ -196,19 +214,19 @@ function App() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl font-bold text-purple-600 mb-1">
-                    ↑ {(networkStats.totalUp / 1024).toFixed(1)} KB/s
+                    ↑ {formatSpeed(networkStats.totalUp)}
                   </div>
                   <div className="text-xl font-bold text-purple-600 mb-5">
-                    ↓ {(networkStats.totalDown / 1024).toFixed(1)} KB/s
+                    ↓ {formatSpeed(networkStats.totalDown)}
                   </div>
                   <div className="flex items-center gap-2 mt-1">
                     <p className="text-xs text-muted-foreground">
-                      总上传: {(networkStats.totalUpTraffic / 1024 / 1024 / 1024).toFixed(2)} GB
+                      总上传: {formatBytes(networkStats.totalUpTraffic)}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 mt-1">
                     <p className="text-xs text-muted-foreground">
-                      总下载: {(networkStats.totalDownTraffic / 1024 / 1024 / 1024).toFixed(2)} GB
+                      总下载: {formatBytes(networkStats.totalDownTraffic)}
                     </p>
                   </div>
                 </CardContent>
